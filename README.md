@@ -11,9 +11,8 @@ custom_header: Header for requesting profile files
 
 auto_save: Whether auto write config to file each time you modify
 
-
 ## Usage
- ``` 
+ ``` bash
 git clone git@github.com:carottX/auto-clash-update.git
 chmod +x getyaml.py
 ./getyaml.py
