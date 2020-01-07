@@ -104,65 +104,46 @@ def delete_profile(pid):
         print('Cancelled')
     if auto_save:save_config()
 
+def print_info():
+    print('='*50)
+    print('Please select your operaton:')
+    print('[0]Update Profile')
+    print('[1]Choose Profile')
+    print('[2]Create a new profile')
+    print('[3]Edit a profile')
+    print('[4]Delete a profile')
+    print('[5]Show all the profiles')
+    print('[6]Refresh the config')
+    print('[7]Save config')
+    print('[8]Exit')
+
+def input_and_op(func):
+    c=input('Please input your choice: ')
+    if(int(c)<len(config['config'])):
+        func(int(c))
+    else:
+        print('Invalid input')
+
 def main():
     get_cur_path()
-    print(cur_path)
     update_config()
     while(1):
-        print('='*50)
-        print('Please select your operaton:')
-        print('[0]Update Profile')
-        print('[1]Choose Profile')
-        print('[2]Create a new profile')
-        print('[3]Edit a profile')
-        print('[4]Delete a profile')
-        print('[5]Show all the profiles')
-        print('[6]Refresh the config')
-        print('[7]Save config')
-        print('[8]Exit')
+        print_info()
         c=input('Please input your choice: ')
         if c=='0':
             show_profiles()
-            c=input('Please input your choice: ')
-            try:
-                if(int(c)<len(config['config'])):
-                    download_profile(int(c))
-                else:
-                    print('Invalid input')
-            except:
-                print('Invalid input')
+            input_and_op(download_profile)
         elif c=='1':
             show_profiles()
-            c=input('Please input your choice: ')
-            try:
-                if(int(c)<len(config['config'])):
-                    move_profile(int(c))
-                else:
-                    print('Invalid input')
-            except:
-                print('Invalid input')
+            input_and_op(move_profile)
         elif c=='2':
             add_profile()
         elif c=='3':
              show_profiles()
-             c=input('Please input your choice: ')
-             try:
-                if int(c)<len(config['config']):
-                    edit_profile(int(c))
-                else:
-                    print('Invalid input')
-             except:
-                print('Invalid input')
+             input_and_op(edit_profile)
         elif c=='4':
             show_profiles()
-            c=input('Please input your choice: ')
-            try:
-                if int(c)<len(config['config']):
-                    delete_profile(int(c))
-                else:
-                    print('Invalid input')
-            except:
-                print('Invalid input')
+            input_and_op(delete_profile)
         elif c=='5':
             show_profiles()
         elif c=='6':
