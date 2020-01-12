@@ -6,6 +6,7 @@ import os
 import shutil
 import json
 import sys
+import tool
 
 cur_path='/home/'
 profile_num=0
@@ -16,8 +17,8 @@ def get_cur_path():
     global cur_path
     cur_path=sys.argv[0]
     while cur_path[-1]!='/':cur_path=cur_path[0:len(cur_path)-1]
-    if not os.path.exists(cur_path+'/config/'):
-        os.makedirs(cur_path+'/config/')
+    if not os.path.exists(cur_path+'config/'):
+        os.makedirs(cur_path+'config/')
 
 def save_config():
     with open(cur_path+'config.json','w') as f:
@@ -46,7 +47,7 @@ def show_last_mod_time(config_id):
 def download_profile(pid):
     global config
     print('Profile %d last modified: %s'%(pid,show_last_mod_time(pid)))
-    config_path=cur_path+'/config/%d.yaml'%(pid)
+    config_path=cur_path+'config/%d.yaml'%(pid)
     header = config['custom_header']
     url=config['config'][pid]['url']
     req=urllib2.Request(url,headers=header)
@@ -58,7 +59,7 @@ def download_profile(pid):
     config['config'][pid]['last_mod_time']=time.time()
 
 def move_profile(pid):
-    config_path=cur_path+'/config/%d.yaml'%(pid)
+    config_path=cur_path+'config/%d.yaml'%(pid)
     dest_path=config['clash_config_path']+'config.yaml'
     shutil.copyfile(config_path,dest_path)
     print('Move Profile %d Success'%(pid))
@@ -79,16 +80,29 @@ def add_profile():
     print('Profile %d added!'%(len(config['config'])-1))
     if auto_save:save_config()
 
+
+def filter_profile(pid,pattern):
+    config_path=cur_path+'config/%d.yaml'%(pid)
+    with open(config_path,'r') as f:
+        f2=open(cur_path+'config/tmp.yaml','w')
+        f2.write(tool.filter(f,pattern))
+        f2.close()
+    shutil.copyfile(cur_path+'config/tmp.yaml',config_path)
+    
+
 def edit_profile(pid):
     print('Choose what to modify?')
-    print('[0]name [1]subscribe link')
+    print('[0]name [1]subscribe link [2]nodes')
     c=input('Please input your choice: ')
     if(c=='0'):
         c=input('Please input what is new: ')
         config['config'][pid]['name']=c
-    else:
+    elif c=='1':
          c=input('Please input what is new: ')
          config['config'][pid]['url']=c
+    elif c=='2':
+        c=input('Please input the pattern:  ')
+        filter_profile(pid,c)
     print('Edit profile %d success!'%(pid))
     config['config'][pid]['last_mod_time']=time.time()
     if auto_save:save_config()
@@ -98,6 +112,8 @@ def delete_profile(pid):
     print('[%d]%s | last modified:%s'%(pid,now['name'],show_last_mod_time(pid)))
     c=input('Are you sure to delete it? [y/n] ' )
     if c=='y':
+        for i in range(pid,len(config['config'])-1):
+            shutil.copyfile(cur_path+'config/%d.yaml'%(i+1),cur_path+'config/%d.yaml'%(i))
         config['config'].pop(pid)
         print('Deleted!')
     else:
@@ -153,8 +169,6 @@ def main():
         else:
             save_config()
             break
-    
-            
 
 if __name__=="__main__":
     main()
