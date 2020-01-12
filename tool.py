@@ -5,7 +5,7 @@ import re
 import copy
 
 def filter(f,pattern):
-    y=yaml.load(f)
+    y=yaml.safe_load(f)
     res=copy.deepcopy(y)
     res['Proxy']=[]
     res['Proxy Group']=[]
@@ -28,6 +28,5 @@ def filter(f,pattern):
             if r or (e in gn):
                 tmp['proxies'].append(e)
         res['Proxy Group'].append(tmp)
-    f3.close()
     s=yaml.dump(res,allow_unicode=True)
     return s

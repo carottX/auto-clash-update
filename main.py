@@ -32,14 +32,11 @@ def update_config():
         l=f.readlines()
         s=''
         s=s.join(l)
-        try:
-            config=json.loads(s)
-            auto_save=config['auto_save']
-        except:
-            print('Config file broken!')
+        config=json.loads(s)
+        auto_save=config['auto_save']
 
-def show_last_mod_time(config_id):
-    last_mod_time=config['config'][config_id]['last_mod_time']
+def show_last_mod_time(pid):
+    last_mod_time=config['config'][pid]['last_mod_time']
     localtime=time.localtime(last_mod_time)
     dt=time.strftime('%Y-%m-%d %H:%M:%S',localtime)
     return dt
@@ -51,12 +48,12 @@ def download_profile(pid):
     header = config['custom_header']
     url=config['config'][pid]['url']
     req=urllib2.Request(url,headers=header)
-    resp=urllib2.urlopen(req,timeout=10)
-    res=resp.read().decode('utf-8')
-    with open(config_path,'w') as f:
-        f.write(res)
-    print('Update Profile %d Success!'%pid)
-    config['config'][pid]['last_mod_time']=time.time()
+    with urllib2.urlopen(req,timeout=10) as resp:
+        res=resp.read().decode('utf-8')
+        with open(config_path,'w') as f:
+            f.write(res)
+        print('Update Profile %d Success!'%pid)
+        config['config'][pid]['last_mod_time']=time.time()
 
 def move_profile(pid):
     config_path=cur_path+'config/%d.yaml'%(pid)
@@ -80,7 +77,6 @@ def add_profile():
     print('Profile %d added!'%(len(config['config'])-1))
     if auto_save:save_config()
 
-
 def filter_profile(pid,pattern):
     config_path=cur_path+'config/%d.yaml'%(pid)
     with open(config_path,'r') as f:
@@ -88,7 +84,6 @@ def filter_profile(pid,pattern):
         f2.write(tool.filter(f,pattern))
         f2.close()
     shutil.copyfile(cur_path+'config/tmp.yaml',config_path)
-    
 
 def edit_profile(pid):
     print('Choose what to modify?')
